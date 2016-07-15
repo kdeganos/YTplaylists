@@ -50,15 +50,10 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     }
 
     public class VideoViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.thumbnailImageView)
-        ImageView mthumbnailImageView;
-        @Bind(R.id.titleTextView)
-        TextView mTitleTextView;
-        @Bind(R.id.descriptionTextView)
-        TextView mDescriptionTextView;
-        //        @Bind(R.id.releaseDateTextView) TextView mReleaseDateTextView;
-        @Bind(R.id.publishedAtTextView)
-        TextView mPublishedAtTextView;
+        @Bind(R.id.thumbnailImageView) ImageView mthumbnailImageView;
+        @Bind(R.id.titleTextView) TextView mTitleTextView;
+        @Bind(R.id.descriptionTextView) TextView mDescriptionTextView;
+        @Bind(R.id.publishedAtTextView) TextView mPublishedAtTextView;
 
         private Context mContext;
 
@@ -83,7 +78,6 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
             Picasso.with(mContext).load(video.getThumbnail()).into(mthumbnailImageView);
             mTitleTextView.setText(video.getTitle());
             mDescriptionTextView.setText(video.getDescription());
-//            mReleaseDateTextView.setText("Release Date: " + video.getReleaseDate());
             mPublishedAtTextView.setText(video.getPublishedAt());
         }
     }

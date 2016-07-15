@@ -9,20 +9,18 @@ import java.util.List;
 /**
  * Created by Guest on 7/15/16.
  */
-public class User {
+public class UserObj {
     String name;
-    String id;
     String email;
-    List<Playlist> playlists = new ArrayList<>();
+    List<String> playlistIds = new ArrayList<>();
 
-    public User() {
+    public UserObj() {
     }
 
-    public User(String name, String id, String email, List<Playlist> playlists) {
+    public UserObj(String name, String email, List<String> playlistIds) {
         this.name = name;
-        this.id = id;
         this.email = email;
-        this.playlists = playlists;
+        this.playlistIds = playlistIds;
 
     }
 
@@ -30,27 +28,21 @@ public class User {
         return name;
     }
 
-    public String getId() {
-        return id;
-    }
 
-    public List<Playlist> getPlaylists() {
-        return playlists;
+    public List<String> getPlaylistIds() {
+        return playlistIds;
     }
-    public void addPlaylist(Playlist playlist) {
-        this.playlists.add(playlist);
+    public void addPlaylistId(String playlistId) {
+        this.playlistIds.add(playlistId);
     }
-    public void setPlaylists(List<Playlist> playlists) {
-        this.playlists = playlists;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+    public void setPlaylistIds(List<String> playlistIds) {
+        this.playlistIds = playlistIds;
     }
 
     public void setName(String name) {
         this.name = name;
     }
+
     public String getEmail() {
         return email;
     }

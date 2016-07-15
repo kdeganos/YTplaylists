@@ -1,27 +1,45 @@
 package com.epicodus.ytplaylists.ui;
 
+import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 
 import com.epicodus.ytplaylists.Constants;
 import com.epicodus.ytplaylists.R;
 import com.epicodus.ytplaylists.adapters.FirebaseVideoViewHolder;
 import com.epicodus.ytplaylists.models.VideoObj;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class PlaylistActivity extends AppCompatActivity {
-    private DatabaseReference mVideoReference;
+
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+
+    private String mUId;
+
+    private DatabaseReference mPlaylistReference;
     private FirebaseRecyclerAdapter mFirebaseAdapter;
 
-    @Bind(R.id.recyclerView)
-    RecyclerView mRecyclerView;
+    @Bind(R.id.recyclerView) RecyclerView mRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,14 +49,49 @@ public class PlaylistActivity extends AppCompatActivity {
         setContentView(R.layout.activity_playlist);
         ButterKnife.bind(this);
 
-        mVideoReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_USERS);
-        setUpFirebaseAdapter();
+        Intent intent = getIntent();
+        final String playlistName = intent.getStringExtra("playlistName");
+        getSupportActionBar().setTitle(playlistName);
+
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    mUId = user.getUid();
+                    mPlaylistReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_PLAYLISTS);
+                    mPlaylistReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_USERS)
+                            .child(mUId).child(Constants.FIREBASE_CHILD_PLAYLISTS).child(playlistName);
+
+                    mPlaylistReference.child("videos").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot snapshot) {
+                            if (snapshot.getValue() != null) {
+                                setUpFirebaseAdapter();
+
+                            } else {
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError arg0) {
+                        }
+                    });
+                } else {
+                }
+            }
+        };
+
+
     }
+
 
     private void setUpFirebaseAdapter() {
         mFirebaseAdapter = new FirebaseRecyclerAdapter<VideoObj, FirebaseVideoViewHolder>
                 (VideoObj.class, R.layout.video_list_item, FirebaseVideoViewHolder.class,
-                        mVideoReference) {
+                        mPlaylistReference) {
             @Override
             protected void populateViewHolder (FirebaseVideoViewHolder viewHolder,
                                                VideoObj model, int position) {
@@ -55,5 +108,62 @@ public class PlaylistActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         mFirebaseAdapter.cleanup();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_search, menu);
+        ButterKnife.bind(this);
+
+
+        MenuItem menuItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+//                getVideos(query);
+                Intent intent = new Intent(PlaylistActivity.this, SearchActivity.class);
+                intent.putExtra("searchTerms", query);
+                startActivity(intent);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void logout() {
+        FirebaseAuth.getInstance().signOut();
+        Intent intent = new Intent(PlaylistActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
     }
 }
