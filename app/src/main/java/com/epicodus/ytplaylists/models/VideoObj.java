@@ -12,20 +12,20 @@ import java.util.Locale;
  * Created by Guest on 7/7/16.
  */
 public class VideoObj {
-    String mVideoId;
-    String mPublishedAt;
-    String mTitle;
-    String mDescription;
-    String mThumbnail;
+    String videoId;
+    String publishedAt;
+    String title;
+    String description;
+    String thumbnail;
 
     public VideoObj() {
     }
 
     public VideoObj(String videoId, String publishedAt, String title, String description, String thumbnail) {
-        this.mVideoId = videoId;
-        this.mTitle = title;
-        this.mDescription = description;
-        this.mThumbnail = thumbnail;
+        this.videoId = videoId;
+        this.title = title;
+        this.description = description;
+        this.thumbnail = thumbnail;
 
         //2016-07-08T13:41:40.000Z
         SimpleDateFormat input, output;
@@ -34,29 +34,29 @@ public class VideoObj {
         try {
             output = new SimpleDateFormat("dd-MMM-yyyy");
             date = input.parse(publishedAt);
-            this.mPublishedAt = output.format(date);
+            this.publishedAt = output.format(date);
         } catch (ParseException e) {
             e.printStackTrace();
         }
     }
 
     public String getVideoId() {
-        return mVideoId;
+        return videoId;
     }
 
     public String getPublishedAt() {
-        return mPublishedAt;
+        return publishedAt;
     }
 
     public String getTitle() {
-        return mTitle;
+        return title;
     }
 
     public String getDescription() {
-        return mDescription;
+        return description;
     }
 
     public String getThumbnail() {
-        return mThumbnail;
+        return thumbnail;
     }
 }

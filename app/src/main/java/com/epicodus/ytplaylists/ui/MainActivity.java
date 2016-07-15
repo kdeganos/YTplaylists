@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
+    @Bind(R.id.newPlaylistButton) Button mNewPlayListButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,12 +49,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-//        if (v == mSearchButton) {
-//            String searchTerms = mSearchTermsEditText.getText().toString();
-//            Intent intent = new Intent(MemberActivity.this, SearchActivity.class);
-//            intent.putExtra("searchTerms", searchTerms);
-//            startActivity(intent);
-//        }
+        if (v == mNewPlayListButton) {
+            Intent intent = new Intent(MainActivity.this, PlaylistActivity.class);
+            startActivity(intent);
+        }
     }
 
     @Override

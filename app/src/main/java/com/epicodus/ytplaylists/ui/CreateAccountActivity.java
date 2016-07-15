@@ -13,13 +13,21 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.epicodus.ytplaylists.Constants;
 import com.epicodus.ytplaylists.R;
+import com.epicodus.ytplaylists.models.Playlist;
+import com.epicodus.ytplaylists.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -38,6 +46,7 @@ public class CreateAccountActivity extends AppCompatActivity implements View.OnC
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private DatabaseReference mDatabaseUsers;
     private ProgressDialog mAuthProgressDialog;
     private String mName;
 
@@ -52,6 +61,9 @@ public class CreateAccountActivity extends AppCompatActivity implements View.OnC
         mCreateUserButton.setOnClickListener(this);
         createAuthStateListener();
         createAuthProgressDialog();
+
+        mDatabaseUsers = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_USERS);
+
     }
 
     @Override
@@ -177,10 +189,17 @@ public class CreateAccountActivity extends AppCompatActivity implements View.OnC
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
+                            addUser(user);
                             Log.d(TAG, user.getDisplayName());
                         }
                     }
 
                 });
+    }
+
+    private void addUser(FirebaseUser firebaseUser) {
+        List<Playlist> playlists = new ArrayList<>();
+        User user = new User(firebaseUser.getDisplayName(), firebaseUser.getUid(), firebaseUser.getEmail(), playlists);
+        mDatabaseUsers.push().setValue(user);
     }
 }
