@@ -55,10 +55,10 @@
             android:layout_marginRight="5dp"/>
 
         <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:id="@+id/movieDivider"
-            android:background="#333"/>
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:id="@+id/movieDivider"
+        android:background="#333"/>
     </RelativeLayout>
 
 </LinearLayout>

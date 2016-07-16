@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,7 +16,9 @@ import android.widget.EditText;
 
 import com.epicodus.ytplaylists.Constants;
 import com.epicodus.ytplaylists.R;
+import com.epicodus.ytplaylists.adapters.FirebasePlaylistViewHolder;
 import com.epicodus.ytplaylists.models.PlaylistObj;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -38,8 +42,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private DatabaseReference mUserReference;
 
+    private FirebaseRecyclerAdapter mFirebaseAdapter;
+
     private String mUId;
 
+    @Bind(R.id.recyclerView) RecyclerView mRecyclerView;
     @Bind(R.id.newPlaylistButton) Button mNewPlayListButton;
     @Bind(R.id.newPlaylistNameEditText) EditText mNewPlaylistName;
 
@@ -81,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         List videoIds = new ArrayList<>();
                         Date date = new Date();
 
-                        PlaylistObj playlist = new PlaylistObj(date, videoIds);
+                        PlaylistObj playlist = new PlaylistObj(newPlaylistName, date, videoIds);
                         mUserReference.child(newPlaylistName).setValue(playlist);
                         Intent intent = new Intent(MainActivity.this, PlaylistActivity.class);
                         intent.putExtra("playlistName", newPlaylistName);
@@ -134,5 +141,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
+    }
+
+    private void setupFirebaseAdapter() {
+        mFirebaseAdapter = new FirebaseRecyclerAdapter<PlaylistObj, FirebasePlaylistViewHolder>(PlaylistObj.class, R.layout.playlist_list_item,
+                FirebasePlaylistViewHolder.class, mUserReference) {
+            @Override
+            protected void populateViewHolder(FirebasePlaylistViewHolder viewHolder, PlaylistObj model, int position) {
+                viewHolder.bindPlaylist(model);
+            }
+        };
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setAdapter(mFirebaseAdapter);
     }
 }

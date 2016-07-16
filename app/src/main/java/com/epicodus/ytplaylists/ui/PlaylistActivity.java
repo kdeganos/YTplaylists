@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,15 +27,22 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class PlaylistActivity extends AppCompatActivity {
+    public static final String TAG = PlaylistActivity.class.getSimpleName();
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     private String mUId;
+    private String playlistName;
+    private List<VideoObj> mVideos = new ArrayList<>();
+    private boolean emptyPlaylist = true;
 
     private DatabaseReference mPlaylistReference;
     private FirebaseRecyclerAdapter mFirebaseAdapter;
@@ -50,7 +58,7 @@ public class PlaylistActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         Intent intent = getIntent();
-        final String playlistName = intent.getStringExtra("playlistName");
+        playlistName = intent.getStringExtra("playlistName");
         getSupportActionBar().setTitle(playlistName);
 
         mAuth = FirebaseAuth.getInstance();
@@ -60,18 +68,19 @@ public class PlaylistActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     mUId = user.getUid();
-                    mPlaylistReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_PLAYLISTS);
                     mPlaylistReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_USERS)
-                            .child(mUId).child(Constants.FIREBASE_CHILD_PLAYLISTS).child(playlistName);
+                            .child(mUId);
 
-                    mPlaylistReference.child("videos").addListenerForSingleValueEvent(new ValueEventListener() {
+                    mPlaylistReference.child(Constants.FIREBASE_CHILD_PLAYLISTS).child(playlistName).child("videos")
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot snapshot) {
                             if (snapshot.getValue() != null) {
+                                emptyPlaylist = false;
                                 setUpFirebaseAdapter();
 
                             } else {
-
+                                emptyPlaylist = true;
                             }
                         }
 
@@ -91,7 +100,7 @@ public class PlaylistActivity extends AppCompatActivity {
     private void setUpFirebaseAdapter() {
         mFirebaseAdapter = new FirebaseRecyclerAdapter<VideoObj, FirebaseVideoViewHolder>
                 (VideoObj.class, R.layout.video_list_item, FirebaseVideoViewHolder.class,
-                        mPlaylistReference) {
+                        mPlaylistReference.child(Constants.FIREBASE_CHILD_PLAYLISTS).child(playlistName).child("videos")) {
             @Override
             protected void populateViewHolder (FirebaseVideoViewHolder viewHolder,
                                                VideoObj model, int position) {
@@ -107,7 +116,7 @@ public class PlaylistActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mFirebaseAdapter.cleanup();
+        if(!emptyPlaylist) mFirebaseAdapter.cleanup();
     }
 
     @Override
@@ -127,6 +136,8 @@ public class PlaylistActivity extends AppCompatActivity {
 //                getVideos(query);
                 Intent intent = new Intent(PlaylistActivity.this, SearchActivity.class);
                 intent.putExtra("searchTerms", query);
+                intent.putExtra("playlistName", playlistName);
+                intent.putExtra("uId", mUId);
                 startActivity(intent);
                 return false;
             }

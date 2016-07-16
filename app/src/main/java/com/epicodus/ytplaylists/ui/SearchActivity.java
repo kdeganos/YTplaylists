@@ -30,6 +30,9 @@ import okhttp3.Response;
 public class SearchActivity extends AppCompatActivity {
     public static final String TAG = SearchActivity.class.getSimpleName();
 
+    private String mPlaylistName;
+    private String mUId;
+
     @Bind(R.id.recyclerView)
 
     RecyclerView mRecyclerView;
@@ -45,6 +48,8 @@ public class SearchActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String searchTerms = intent.getStringExtra("searchTerms");
+        mPlaylistName = intent.getStringExtra("playlistName");
+        mUId = intent.getStringExtra("uId");
 
         getVideos(searchTerms);
 
@@ -67,7 +72,7 @@ public class SearchActivity extends AppCompatActivity {
 
                     @Override
                     public void run() {
-                        mAdapter = new VideoListAdapter(getApplicationContext(), mVideos);
+                        mAdapter = new VideoListAdapter(getApplicationContext(), mVideos, mPlaylistName, mUId);
                         mRecyclerView.setAdapter(mAdapter);
                         RecyclerView.LayoutManager layoutManager =
                                 new LinearLayoutManager(SearchActivity.this);
