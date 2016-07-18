@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,8 +17,11 @@ import android.view.View;
 
 import com.epicodus.ytplaylists.Constants;
 import com.epicodus.ytplaylists.R;
+import com.epicodus.ytplaylists.adapters.FirebaseVideoListAdapter;
 import com.epicodus.ytplaylists.adapters.FirebaseVideoViewHolder;
 import com.epicodus.ytplaylists.models.VideoObj;
+import com.epicodus.ytplaylists.util.OnStartDragListener;
+import com.epicodus.ytplaylists.util.SimpleItemTouchHelperCallback;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,7 +37,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class PlaylistActivity extends AppCompatActivity {
+public class PlaylistActivity extends AppCompatActivity implements OnStartDragListener {
     public static final String TAG = PlaylistActivity.class.getSimpleName();
 
     private FirebaseAuth mAuth;
@@ -45,7 +49,8 @@ public class PlaylistActivity extends AppCompatActivity {
     private boolean emptyPlaylist = true;
 
     private DatabaseReference mPlaylistReference;
-    private FirebaseRecyclerAdapter mFirebaseAdapter;
+    private FirebaseVideoListAdapter mFirebaseAdapter;
+    private ItemTouchHelper mItemTouchHelper;
 
     @Bind(R.id.recyclerView) RecyclerView mRecyclerView;
 
@@ -71,7 +76,7 @@ public class PlaylistActivity extends AppCompatActivity {
                     mPlaylistReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_USERS)
                             .child(mUId);
 
-                    mPlaylistReference.child(Constants.FIREBASE_CHILD_PLAYLISTS).child(playlistName).child("videos")
+                    mPlaylistReference.child(Constants.FIREBASE_CHILD_PLAYLISTS).child(playlistName).child(Constants.FIREBASE_CHILD_VIDEOS)
                             .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot snapshot) {
@@ -96,21 +101,19 @@ public class PlaylistActivity extends AppCompatActivity {
 
     }
 
-
     private void setUpFirebaseAdapter() {
-        mFirebaseAdapter = new FirebaseRecyclerAdapter<VideoObj, FirebaseVideoViewHolder>
-                (VideoObj.class, R.layout.video_list_item, FirebaseVideoViewHolder.class,
-                        mPlaylistReference.child(Constants.FIREBASE_CHILD_PLAYLISTS).child(playlistName).child("videos")) {
-            @Override
-            protected void populateViewHolder (FirebaseVideoViewHolder viewHolder,
-                                               VideoObj model, int position) {
-                viewHolder.bindVideo(model);
+        Log.d("--", "setUpFirebaseAdapter: "+        mPlaylistReference.child(playlistName)
+        );
 
-            }
-        };
+        mFirebaseAdapter = new FirebaseVideoListAdapter (VideoObj.class, R.layout.video_list_item_drag, FirebaseVideoViewHolder.class,
+                mPlaylistReference.child(Constants.FIREBASE_CHILD_PLAYLISTS).child(playlistName).child(Constants.FIREBASE_CHILD_VIDEOS), this, this);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mFirebaseAdapter);
+
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mFirebaseAdapter);
+        mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
     }
 
     @Override
@@ -176,5 +179,10 @@ public class PlaylistActivity extends AppCompatActivity {
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
+    }
+
+    @Override
+    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+        mItemTouchHelper.startDrag(viewHolder);
     }
 }
