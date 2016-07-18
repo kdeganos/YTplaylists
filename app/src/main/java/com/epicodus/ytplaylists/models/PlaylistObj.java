@@ -11,27 +11,27 @@ import java.util.List;
  */
 public class PlaylistObj {
     String playlistName;
-    List<VideoObj> videoIds = new ArrayList<>();
+    List<VideoObj> videoObject = new ArrayList<>();
     String timestamp;
 
     public PlaylistObj() {}
 
-    public PlaylistObj(String name, Date timestamp, List<VideoObj> videoIds) {
+    public PlaylistObj(String name, Date timestamp, List<VideoObj> videoObject) {
         this.playlistName = name;
-        this.videoIds = videoIds;
+        this.videoObject = videoObject;
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         this.timestamp = dateFormat.format(timestamp);
     }
 
     public List<VideoObj> getVideos() {
-        return videoIds;
+        return videoObject;
     }
     public void addVideoId(VideoObj videoId) {
-        this.videoIds.add(videoId);
+        this.videoObject.add(videoId);
     }
-    public void setVideoIds(List<VideoObj> videoIds) {
-        this.videoIds = videoIds;
+    public void setVideoIds(List<VideoObj> videoObject) {
+        this.videoObject = videoObject;
     }
 
     public String getPlaylistName() {

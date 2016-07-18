@@ -28,6 +28,7 @@ public class FirebaseVideoViewHolder extends RecyclerView.ViewHolder {
 
     View mView;
     Context mContext;
+    public ImageView mThumbnailImageView;
 
     public FirebaseVideoViewHolder(View itemView) {
         super(itemView);
@@ -37,12 +38,12 @@ public class FirebaseVideoViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindVideo(VideoObj video) {
-        ImageView thumbnailImageView = (ImageView) mView.findViewById(R.id.thumbnailImageView);
+        mThumbnailImageView = (ImageView) mView.findViewById(R.id.thumbnailImageView);
         TextView titleTextView = (TextView) mView.findViewById(R.id.titleTextView);
         TextView descriptionTextView = (TextView) mView.findViewById(R.id.descriptionTextView);
         TextView publishedAtTextView = (TextView) mView.findViewById(R.id.publishedAtTextView);
 
-        Picasso.with(mContext).load(video.getThumbnail()).into(thumbnailImageView);
+        Picasso.with(mContext).load(video.getThumbnail()).into(mThumbnailImageView);
         titleTextView.setText(video.getTitle());
         descriptionTextView.setText(video.getDescription());
         publishedAtTextView.setText(video.getPublishedAt());

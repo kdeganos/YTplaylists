@@ -65,13 +65,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     String name = user.getDisplayName();
                     mUId = user.getUid();
                     getSupportActionBar().setTitle("Welcome, " + name + "!");
-                    mUserReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_USERS).child(mUId).child(Constants.FIREBASE_CHILD_PLAYLISTS);
+                    mUserReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_USERS)
+                            .child(mUId).child(Constants.FIREBASE_CHILD_PLAYLISTS);
+
+                    setupFirebaseAdapter();
+
                 } else {
                 }
             }
         };
 
         mNewPlayListButton.setOnClickListener(this);
+
     }
 
     @Override
@@ -144,8 +149,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setupFirebaseAdapter() {
-        mFirebaseAdapter = new FirebaseRecyclerAdapter<PlaylistObj, FirebasePlaylistViewHolder>(PlaylistObj.class, R.layout.playlist_list_item,
-                FirebasePlaylistViewHolder.class, mUserReference) {
+        Log.d(TAG, "setupFirebaseAdapter: " +mUserReference);
+        mFirebaseAdapter = new FirebaseRecyclerAdapter<PlaylistObj, FirebasePlaylistViewHolder>
+                (PlaylistObj.class, R.layout.playlist_list_item, FirebasePlaylistViewHolder.class, mUserReference) {
             @Override
             protected void populateViewHolder(FirebasePlaylistViewHolder viewHolder, PlaylistObj model, int position) {
                 viewHolder.bindPlaylist(model);
