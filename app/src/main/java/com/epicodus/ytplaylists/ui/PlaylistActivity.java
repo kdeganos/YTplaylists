@@ -44,10 +44,12 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     private String mUId;
-    private String playlistName;
+    private String mPlaylistName;
+    private String mPlaylistId;
     private List<VideoObj> mVideos = new ArrayList<>();
     private boolean emptyPlaylist = true;
 
+    private DatabaseReference mUserReference;
     private DatabaseReference mPlaylistReference;
     private FirebaseVideoListAdapter mFirebaseAdapter;
     private ItemTouchHelper mItemTouchHelper;
@@ -63,8 +65,9 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
         ButterKnife.bind(this);
 
         Intent intent = getIntent();
-        playlistName = intent.getStringExtra("playlistName");
-        getSupportActionBar().setTitle(playlistName);
+        mPlaylistName = intent.getStringExtra("playlistName");
+        mPlaylistId = intent.getStringExtra("playlistId");
+        getSupportActionBar().setTitle(mPlaylistName);
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -73,10 +76,11 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     mUId = user.getUid();
-                    mPlaylistReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_USERS)
+                    mUserReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_USERS)
                             .child(mUId);
 
-                    mPlaylistReference.child(Constants.FIREBASE_CHILD_PLAYLISTS).child(playlistName).child(Constants.FIREBASE_CHILD_VIDEOS)
+                    mPlaylistReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_PLAYLISTS).child(mPlaylistId);
+                    mPlaylistReference.child(Constants.FIREBASE_CHILD_VIDEOS)
                             .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot snapshot) {
@@ -102,11 +106,9 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
     }
 
     private void setUpFirebaseAdapter() {
-        Log.d("--", "setUpFirebaseAdapter: "+        mPlaylistReference.child(playlistName)
-        );
 
         mFirebaseAdapter = new FirebaseVideoListAdapter (VideoObj.class, R.layout.video_list_item_drag, FirebaseVideoViewHolder.class,
-                mPlaylistReference.child(Constants.FIREBASE_CHILD_PLAYLISTS).child(playlistName).child(Constants.FIREBASE_CHILD_VIDEOS), this, this);
+                mPlaylistReference.child(Constants.FIREBASE_CHILD_VIDEOS), this, this);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mFirebaseAdapter);
@@ -139,8 +141,9 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
 //                getVideos(query);
                 Intent intent = new Intent(PlaylistActivity.this, SearchActivity.class);
                 intent.putExtra("searchTerms", query);
-                intent.putExtra("playlistName", playlistName);
-                intent.putExtra("uId", mUId);
+                intent.putExtra("playlistName", mPlaylistName);
+                intent.putExtra("playlistId", mPlaylistId);
+
                 startActivity(intent);
                 return false;
             }

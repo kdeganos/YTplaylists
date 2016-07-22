@@ -35,14 +35,14 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     private ArrayList<VideoObj> mVideos = new ArrayList<>();
     private Context mContext;
     private String mPlaylistName;
-    private String mUId;
+    private String mPlaylistId;
 
 
-    public VideoListAdapter(Context context, ArrayList<VideoObj> videos, String playlistName, String uId) {
+    public VideoListAdapter(Context context, ArrayList<VideoObj> videos, String playlistName, String playlistId) {
         mContext = context;
         mVideos = videos;
         mPlaylistName = playlistName;
-        mUId = uId;
+        mPlaylistId = playlistId;
 
     }
 
@@ -94,16 +94,18 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            Toast.makeText(mContext, "Yaay", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, "Video added", Toast.LENGTH_SHORT).show();
 
-                            DatabaseReference playlistRef = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_USERS)
-                                    .child(mUId);
+                            DatabaseReference playlistRef = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_PLAYLISTS);
 
-                            playlistRef.child(Constants.FIREBASE_CHILD_PLAYLISTS).child(mPlaylistName).child(Constants.FIREBASE_CHILD_VIDEOS).push().setValue(mVideos.get(itemPosition));
+                            playlistRef.child(mPlaylistId)
+                                    .child(Constants.FIREBASE_CHILD_VIDEOS)
+                                    .child(mVideos.get(itemPosition).getVideoId()).setValue(mVideos.get(itemPosition));
 
                             Intent intent = new Intent(mContext, PlaylistActivity.class);
                             intent.putExtra("playlistName", mPlaylistName);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            intent.putExtra("playlistId", mPlaylistId);
+
                             mContext.startActivity(intent);
                         }})
                     .setNegativeButton(android.R.string.no, null).show();

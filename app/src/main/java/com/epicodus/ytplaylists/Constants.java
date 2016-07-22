@@ -11,11 +11,13 @@ public class Constants {
     public static final String SEARCH_PARAMETER = "q";
 
     public static final String FIREBASE_CHILD_USERS = "users";
-    public static final String FIREBASE_CHILD_PLAYLISTIDS = "playlistIds";
+    public static final String FIREBASE_CHILD_USERIDS = "userIds";
+
     public static final String FIREBASE_CHILD_PLAYLISTS = "playlists";
-    public static final String FIREBASE_CHILD_VIDEOS = "videoObjects";
+    public static final String FIREBASE_CHILD_PLAYLISTIDS = "playlistIds";
 
-
+    public static final String FIREBASE_CHILD_VIDEOS = "videos";
+    public static final String FIREBASE_CHILD_VIDEOIDS = "videoIds";
 
 }
 

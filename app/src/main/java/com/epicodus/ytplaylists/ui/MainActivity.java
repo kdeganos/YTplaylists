@@ -41,10 +41,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     private DatabaseReference mUserReference;
+    private DatabaseReference mPlaylistReference;
+
 
     private FirebaseRecyclerAdapter mFirebaseAdapter;
 
-    private String mUId;
+    private String mUid;
 
     @Bind(R.id.recyclerView) RecyclerView mRecyclerView;
     @Bind(R.id.newPlaylistButton) Button mNewPlayListButton;
@@ -56,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        mPlaylistReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_PLAYLISTS);
+
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -63,12 +67,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     String name = user.getDisplayName();
-                    mUId = user.getUid();
+                    mUid = user.getUid();
                     getSupportActionBar().setTitle("Welcome, " + name + "!");
                     mUserReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_USERS)
-                            .child(mUId).child(Constants.FIREBASE_CHILD_PLAYLISTS);
+                            .child(mUid);
 
-                    setupFirebaseAdapter();
+//                    setupFirebaseAdapter();
 
                 } else {
                 }
@@ -84,27 +88,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (v == mNewPlayListButton) {
             final String newPlaylistName = mNewPlaylistName.getText().toString().trim();
 
-            mUserReference.child(newPlaylistName).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    if (snapshot.getValue() != null) {
-                        mNewPlaylistName.setError(newPlaylistName + " already exists!");
-                    } else {
-                        List videoIds = new ArrayList<>();
-                        Date date = new Date();
+            DatabaseReference playlistRef = FirebaseDatabase.getInstance()
+                    .getReference(Constants.FIREBASE_CHILD_PLAYLISTS);
 
-                        PlaylistObj playlist = new PlaylistObj(newPlaylistName, date, videoIds);
-                        mUserReference.child(newPlaylistName).setValue(playlist);
-                        Intent intent = new Intent(MainActivity.this, PlaylistActivity.class);
-                        intent.putExtra("playlistName", newPlaylistName);
-                        startActivity(intent);
-                    }
-                }
+            DatabaseReference pushRef = playlistRef.push();
+            String pushId = pushRef.getKey();
 
-                @Override
-                public void onCancelled(DatabaseError arg0) {
-                }
-            });
+            Date date = new Date();
+            PlaylistObj playlist = new PlaylistObj(pushId, newPlaylistName, mUid, date);
+
+            pushRef.setValue(playlist);
+
+            mUserReference.child("ownedPlaylistIds").push().setValue(pushId);
+
+            Intent intent = new Intent(MainActivity.this, PlaylistActivity.class);
+            intent.putExtra("playlistName", newPlaylistName);
+            intent.putExtra("playlistId", pushId);
+            startActivity(intent);
+
+//            mUserReference.child(newPlaylistName).addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(DataSnapshot snapshot) {
+//                    if (snapshot.getValue() != null) {
+//                        mNewPlaylistName.setError(newPlaylistName + " already exists!");
+//                    } else {
+//                        List videoIds = new ArrayList<>();
+//                        Date date = new Date();
+//
+//                        PlaylistObj playlist = new PlaylistObj(newPlaylistName, date, videoIds);
+//                        mUserReference.child(newPlaylistName).setValue(playlist);
+//                        Intent intent = new Intent(MainActivity.this, PlaylistActivity.class);
+//                        intent.putExtra("playlistName", newPlaylistName);
+//                        startActivity(intent);
+//                    }
+//                }
+//
+//                @Override
+//                public void onCancelled(DatabaseError arg0) {
+//                }
+//            });
         }
     }
 
@@ -149,9 +171,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setupFirebaseAdapter() {
-        Log.d(TAG, "setupFirebaseAdapter: " +mUserReference);
         mFirebaseAdapter = new FirebaseRecyclerAdapter<PlaylistObj, FirebasePlaylistViewHolder>
-                (PlaylistObj.class, R.layout.playlist_list_item, FirebasePlaylistViewHolder.class, mUserReference) {
+                (PlaylistObj.class, R.layout.playlist_list_item, FirebasePlaylistViewHolder.class,
+                        mPlaylistReference) {
             @Override
             protected void populateViewHolder(FirebasePlaylistViewHolder viewHolder, PlaylistObj model, int position) {
                 viewHolder.bindPlaylist(model);
@@ -160,5 +182,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mFirebaseAdapter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (mFirebaseAdapter != null) {
+            mFirebaseAdapter.cleanup();
+        }
     }
 }

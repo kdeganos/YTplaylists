@@ -31,7 +31,7 @@ public class SearchActivity extends AppCompatActivity {
     public static final String TAG = SearchActivity.class.getSimpleName();
 
     private String mPlaylistName;
-    private String mUId;
+    private String mPlaylistId;
 
     @Bind(R.id.recyclerView)
 
@@ -49,7 +49,7 @@ public class SearchActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String searchTerms = intent.getStringExtra("searchTerms");
         mPlaylistName = intent.getStringExtra("playlistName");
-        mUId = intent.getStringExtra("uId");
+        mPlaylistId = intent.getStringExtra("playlistId");
 
         getVideos(searchTerms);
 
@@ -72,7 +72,7 @@ public class SearchActivity extends AppCompatActivity {
 
                     @Override
                     public void run() {
-                        mAdapter = new VideoListAdapter(getApplicationContext(), mVideos, mPlaylistName, mUId);
+                        mAdapter = new VideoListAdapter(getApplicationContext(), mVideos, mPlaylistName, mPlaylistId);
                         mRecyclerView.setAdapter(mAdapter);
                         RecyclerView.LayoutManager layoutManager =
                                 new LinearLayoutManager(SearchActivity.this);

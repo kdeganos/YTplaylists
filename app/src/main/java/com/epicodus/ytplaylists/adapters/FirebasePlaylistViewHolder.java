@@ -48,22 +48,22 @@ public class FirebasePlaylistViewHolder extends RecyclerView.ViewHolder implemen
         mView = itemView;
         mContext = itemView.getContext();
 
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    String name = user.getDisplayName();
-                    mUId = user.getUid();
-                    mUserReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_USERS)
-                            .child(mUId).child(Constants.FIREBASE_CHILD_PLAYLISTS);
-
-
-                } else {
-                }
-            }
-        };
+//        mAuth = FirebaseAuth.getInstance();
+//        mAuthListener = new FirebaseAuth.AuthStateListener() {
+//            @Override
+//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+//                FirebaseUser user = firebaseAuth.getCurrentUser();
+//                if (user != null) {
+//                    String name = user.getDisplayName();
+//                    mUId = user.getUid();
+//                    mUserReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_USERS)
+//                            .child(mUId).child(Constants.FIREBASE_CHILD_PLAYLISTIDS);
+//
+//
+//                } else {
+//                }
+//            }
+//        };
 
 
         itemView.setOnClickListener(this);

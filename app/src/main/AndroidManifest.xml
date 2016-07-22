@@ -20,7 +20,12 @@
         </activity>
         <activity android:name=".ui.CreateAccountActivity" />
         <activity android:name=".ui.SearchActivity" />
-        <activity android:name=".ui.PlaylistActivity"></activity>
+        <activity android:name=".ui.PlaylistActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.epicodus.ytplaylists.ui.MainActivity">
+            </meta-data>
+        </activity>
     </application>
 
 </manifest>
