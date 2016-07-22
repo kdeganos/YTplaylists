@@ -46,7 +46,6 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
     private String mUId;
     private String playlistName;
     private List<VideoObj> mVideos = new ArrayList<>();
-    private boolean emptyPlaylist = true;
 
     private DatabaseReference mPlaylistReference;
     private FirebaseVideoListAdapter mFirebaseAdapter;
@@ -81,11 +80,9 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
                         @Override
                         public void onDataChange(DataSnapshot snapshot) {
                             if (snapshot.getValue() != null) {
-                                emptyPlaylist = false;
                                 setUpFirebaseAdapter();
 
                             } else {
-                                emptyPlaylist = true;
                             }
                         }
 
@@ -102,11 +99,10 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
     }
 
     private void setUpFirebaseAdapter() {
-        Log.d("--", "setUpFirebaseAdapter: "+        mPlaylistReference.child(playlistName)
-        );
 
         mFirebaseAdapter = new FirebaseVideoListAdapter (VideoObj.class, R.layout.video_list_item_drag, FirebaseVideoViewHolder.class,
                 mPlaylistReference.child(Constants.FIREBASE_CHILD_PLAYLISTS).child(playlistName).child(Constants.FIREBASE_CHILD_VIDEOS), this, this);
+
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mFirebaseAdapter);
@@ -119,7 +115,7 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(!emptyPlaylist) mFirebaseAdapter.cleanup();
+        if(mFirebaseAdapter != null) mFirebaseAdapter.cleanup();
     }
 
     @Override

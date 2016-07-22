@@ -149,7 +149,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setupFirebaseAdapter() {
-        Log.d(TAG, "setupFirebaseAdapter: " +mUserReference);
         mFirebaseAdapter = new FirebaseRecyclerAdapter<PlaylistObj, FirebasePlaylistViewHolder>
                 (PlaylistObj.class, R.layout.playlist_list_item, FirebasePlaylistViewHolder.class, mUserReference) {
             @Override

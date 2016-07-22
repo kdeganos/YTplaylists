@@ -13,6 +13,7 @@ public class UserObj {
     String name;
     String email;
     List<String> playlistIds = new ArrayList<>();
+    List<String> friendIds = new ArrayList<>();
 
     public UserObj() {
     }
@@ -49,5 +50,15 @@ public class UserObj {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<String> getFriendIds() {
+        return friendIds;
+    }
+    public void addFriendId(String friendId) {
+        this.friendIds.add(friendId);
+    }
+    public void setFriendIds(List<String> friendIds) {
+        this.friendIds = friendIds;
     }
 }
