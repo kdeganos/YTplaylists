@@ -14,6 +14,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.epicodus.ytplaylists.Constants;
 import com.epicodus.ytplaylists.R;
@@ -37,7 +39,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class PlaylistActivity extends AppCompatActivity implements OnStartDragListener {
+public class PlaylistActivity extends AppCompatActivity implements OnStartDragListener, View.OnClickListener {
     public static final String TAG = PlaylistActivity.class.getSimpleName();
 
     private FirebaseAuth mAuth;
@@ -52,6 +54,8 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
     private ItemTouchHelper mItemTouchHelper;
 
     @Bind(R.id.recyclerView) RecyclerView mRecyclerView;
+    @Bind(R.id.videoSearchButton) Button mVideoSearchButton;
+    @Bind(R.id.videoSearchEditText) EditText mVideoSearchEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +99,7 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
             }
         };
 
-
+        mVideoSearchButton.setOnClickListener(this);
     }
 
     private void setUpFirebaseAdapter() {
@@ -121,39 +125,45 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_search, menu);
+        inflater.inflate(R.menu.menu_new_playlist, menu);
         ButterKnife.bind(this);
 
 
-        MenuItem menuItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+//        MenuItem menuItem = menu.findItem(R.id.action_search);
+//        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+//
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                Intent intent = new Intent(PlaylistActivity.this, SearchActivity.class);
+//                intent.putExtra("searchTerms", query);
+//                intent.putExtra("playlistName", playlistName);
+//                intent.putExtra("uId", mUId);
+//                startActivity(intent);
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                return false;
+//            }
+//        });
+//
+//        return true;
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        return super.onCreateOptionsMenu(menu);
 
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-//                getVideos(query);
-                Intent intent = new Intent(PlaylistActivity.this, SearchActivity.class);
-                intent.putExtra("searchTerms", query);
-                intent.putExtra("playlistName", playlistName);
-                intent.putExtra("uId", mUId);
-                startActivity(intent);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
-
-        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
-    }
+        int id = item.getItemId();
+        if (id == R.id.action_add_user) {
+            return true;
+
+        }
+        return super.onOptionsItemSelected(item);    }
 
     private void logout() {
         FirebaseAuth.getInstance().signOut();
@@ -180,5 +190,17 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mItemTouchHelper.startDrag(viewHolder);
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (view == mVideoSearchButton) {
+            String query = mVideoSearchEditText.getText().toString();
+            Intent intent = new Intent(PlaylistActivity.this, SearchActivity.class);
+            intent.putExtra("searchTerms", query);
+            intent.putExtra("playlistName", playlistName);
+            intent.putExtra("uId", mUId);
+            startActivity(intent);
+        }
     }
 }
