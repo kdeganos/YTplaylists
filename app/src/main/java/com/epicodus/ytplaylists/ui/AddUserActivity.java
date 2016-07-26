@@ -54,8 +54,7 @@ public class AddUserActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-
-                            mUsers.add((UserObj) userSnapshot.getValue(UserObj.class));
+                            mUsers.add(userSnapshot.getValue(UserObj.class));
                         }
 
                         mAdapter = new UserListAdapter(getApplicationContext(), mUsers, mPlaylistName, mOwnerUId);

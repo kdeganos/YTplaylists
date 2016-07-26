@@ -91,9 +91,9 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
                         public void onClick(DialogInterface dialog, int whichButton) {
                             Toast.makeText(mContext, "Shared" + String.valueOf(itemPosition), Toast.LENGTH_SHORT).show();
 
-
+                            if (user.getName)
                             playlistRef.child("sharedUsers").push()
-                                    .setValue(mUsers.get(itemPosition).getUserId());
+                                    .setValue(user.getUserId());
 
                             Intent intent = new Intent(mContext, PlaylistActivity.class);
                             intent.putExtra("playlistName", mPlaylistName);
