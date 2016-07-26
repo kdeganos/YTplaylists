@@ -35,12 +35,15 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     private ArrayList<VideoObj> mVideos = new ArrayList<>();
     private Context mContext;
     private String mPlaylistName;
+    private String mPlaylistId;
     private String mUId;
 
-    public VideoListAdapter(Context context, ArrayList<VideoObj> videos, String playlistName, String uId) {
+    public VideoListAdapter(Context context, ArrayList<VideoObj> videos, String playlistName, String playlistId, String uId) {
         mContext = context;
         mVideos = videos;
         mPlaylistName = playlistName;
+        mPlaylistId = playlistId;
+        Log.d(TAG, "VideoListAdapter: " + mPlaylistId);
         mUId = uId;
 
     }
@@ -95,12 +98,13 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
                         public void onClick(DialogInterface dialog, int whichButton) {
                             Toast.makeText(mContext, "Yaay", Toast.LENGTH_SHORT).show();
 
-                            DatabaseReference playlistRef = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_USERS)
-                                    .child(mUId);
+                            DatabaseReference playlistRef = FirebaseDatabase.getInstance()
+                                    .getReference(Constants.FIREBASE_CHILD_PLAYLISTS).child(mPlaylistId);
 
-                            playlistRef.child(Constants.FIREBASE_CHILD_PLAYLISTS)
-                                    .child(mPlaylistName)
-                                    .child(Constants.FIREBASE_CHILD_VIDEOS)
+//                            playlistRef.child(Constants.FIREBASE_CHILD_VIDEOS)
+//                                    .child(mVideos.get(itemPosition).getVideoId()).setValue(mVideos.get(itemPosition));
+
+                            playlistRef.child(Constants.FIREBASE_CHILD_VIDEOS)
                                     .push().setValue(mVideos.get(itemPosition));
 
                             Intent intent = new Intent(mContext, PlaylistActivity.class);

@@ -1,10 +1,14 @@
 package com.epicodus.ytplaylists.models;
 
+import com.google.firebase.database.Exclude;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Guest on 7/15/16.
@@ -73,4 +77,5 @@ public class UserObj {
     public void setFriendIds(List<String> friendIds) {
         this.friendIds = friendIds;
     }
+
 }

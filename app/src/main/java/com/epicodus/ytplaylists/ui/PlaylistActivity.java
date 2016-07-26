@@ -49,6 +49,7 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
 
     private String mUId;
     private String mPlaylistName;
+    private String mPlaylistId;
     private String mQuery;
     private List<VideoObj> mVideos = new ArrayList<>();
 
@@ -71,6 +72,8 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
 
         Intent intent = getIntent();
         mPlaylistName = intent.getStringExtra("playlistName");
+        mPlaylistId = intent.getStringExtra("playlistId");
+
         getSupportActionBar().setTitle(mPlaylistName);
 
         mAuth = FirebaseAuth.getInstance();
@@ -80,11 +83,10 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     mUId = user.getUid();
-                    mPlaylistReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_USERS)
-                            .child(mUId);
+                    mPlaylistReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_PLAYLISTS)
+                            .child(mPlaylistId).child(Constants.FIREBASE_CHILD_VIDEOS);
 
-                    mPlaylistReference.child(Constants.FIREBASE_CHILD_PLAYLISTS).child(mPlaylistName).child(Constants.FIREBASE_CHILD_VIDEOS)
-                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                    mPlaylistReference.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot snapshot) {
                             if (snapshot.getValue() != null) {
@@ -109,7 +111,7 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
     private void setUpFirebaseAdapter() {
 
         mFirebaseAdapter = new FirebaseVideoListAdapter (VideoObj.class, R.layout.video_list_item_drag, FirebaseVideoViewHolder.class,
-                mPlaylistReference.child(Constants.FIREBASE_CHILD_PLAYLISTS).child(mPlaylistName).child(Constants.FIREBASE_CHILD_VIDEOS), this, this);
+                mPlaylistReference, this, this);
 
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -173,6 +175,7 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
             Intent intent = new Intent(PlaylistActivity.this, AddUserActivity.class);
             intent.putExtra("searchTerms", mQuery);
             intent.putExtra("playlistName", mPlaylistName);
+            intent.putExtra("playlistId", mPlaylistId);
             intent.putExtra("uId", mUId);
             startActivity(intent);
             return true;
@@ -214,6 +217,7 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
             Intent intent = new Intent(PlaylistActivity.this, SearchActivity.class);
             intent.putExtra("searchTerms", mQuery);
             intent.putExtra("playlistName", mPlaylistName);
+            intent.putExtra("playlistId", mPlaylistId);
             intent.putExtra("uId", mUId);
             startActivity(intent);
         }

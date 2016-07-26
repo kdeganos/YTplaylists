@@ -27,6 +27,7 @@ public class AddUserActivity extends AppCompatActivity {
 
 
     private String mPlaylistName;
+    private String mPlaylistId;
     private String mOwnerUId;
     private String mSearchTerms;
     private UserListAdapter mAdapter;
@@ -45,6 +46,7 @@ public class AddUserActivity extends AppCompatActivity {
         Intent intent = getIntent();
         mPlaylistName = intent.getStringExtra("playlistName");
         mOwnerUId = intent.getStringExtra("uId");
+        mPlaylistId = intent.getStringExtra("playlistId");
         mSearchTerms = intent.getStringExtra("searchTerms");
 
         mUserReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_USERS);
@@ -58,7 +60,7 @@ public class AddUserActivity extends AppCompatActivity {
                             mUsers.add((UserObj) userSnapshot.getValue(UserObj.class));
                         }
 
-                        mAdapter = new UserListAdapter(getApplicationContext(), mUsers, mPlaylistName, mOwnerUId);
+                        mAdapter = new UserListAdapter(getApplicationContext(), mUsers, mPlaylistName, mOwnerUId, mPlaylistId);
                         mRecyclerView.setAdapter(mAdapter);
                         RecyclerView.LayoutManager layoutManager =
                                 new LinearLayoutManager(AddUserActivity.this);
@@ -76,13 +78,13 @@ public class AddUserActivity extends AppCompatActivity {
 
     }
 
-    private void getUsers() {
-
-        mAdapter = new UserListAdapter(getApplicationContext(), mUsers, mPlaylistName, mOwnerUId);
-        mRecyclerView.setAdapter(mAdapter);
-        RecyclerView.LayoutManager layoutManager =
-                new LinearLayoutManager(AddUserActivity.this);
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setHasFixedSize(true);
-    }
+//    private void getUsers() {
+//
+//        mAdapter = new UserListAdapter(getApplicationContext(), mUsers, mPlaylistName, mOwnerUId);
+//        mRecyclerView.setAdapter(mAdapter);
+//        RecyclerView.LayoutManager layoutManager =
+//                new LinearLayoutManager(AddUserActivity.this);
+//        mRecyclerView.setLayoutManager(layoutManager);
+//        mRecyclerView.setHasFixedSize(true);
+//    }
 }

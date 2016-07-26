@@ -32,7 +32,9 @@ import butterknife.ButterKnife;
  */
 public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserViewHolder> {
     private ArrayList<UserObj> mUsers = new ArrayList<>();
+
     private String mPlaylistName;
+    private String mPlaylistId;
     private String mOwnerUId;
 
 
@@ -42,10 +44,11 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
     @Bind(R.id.userEmailTextView) TextView mUserEmailTextView;
 
 
-    public UserListAdapter(Context context, ArrayList<UserObj> users, String playlistName, String ownerId) {
+    public UserListAdapter(Context context, ArrayList<UserObj> users, String playlistName, String ownerId, String playlistId) {
         mContext = context;
         mUsers = users;
         mPlaylistName = playlistName;
+        mPlaylistId = playlistId;
         mOwnerUId = ownerId;
 
 
@@ -75,12 +78,11 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
             final int itemPosition = getLayoutPosition();
 
             final UserObj user = mUsers.get(itemPosition);
-            Log.d("XXXXXXX", "onClick: " + user.getUserId());
             String email = mUserEmailTextView.getText().toString();
 
 
-            final DatabaseReference playlistRef = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_USERS)
-                    .child(mOwnerUId).child(Constants.FIREBASE_CHILD_PLAYLISTS).child(mPlaylistName);
+            final DatabaseReference playlistRef = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_PLAYLISTS)
+                    .child(mPlaylistId);
 
 
             new AlertDialog.Builder(mContext)
@@ -98,6 +100,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
 
                             Intent intent = new Intent(mContext, PlaylistActivity.class);
                             intent.putExtra("playlistName", mPlaylistName);
+                            intent.putExtra("playlistId", mPlaylistId);
                             mContext.startActivity(intent);
                         }})
                     .setNegativeButton(android.R.string.no, null).show();

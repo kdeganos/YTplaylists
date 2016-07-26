@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     private DatabaseReference mUserReference;
+    DatabaseReference mPlaylistReference;
 
     private FirebaseRecyclerAdapter mFirebaseAdapter;
 
@@ -55,6 +56,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+
+
+        mPlaylistReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_PLAYLISTS);
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -84,27 +89,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (v == mNewPlayListButton) {
             final String newPlaylistName = mNewPlaylistName.getText().toString().trim();
 
-            mUserReference.child(newPlaylistName).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    if (snapshot.getValue() != null) {
-                        mNewPlaylistName.setError(newPlaylistName + " already exists!");
-                    } else {
-                        List videoIds = new ArrayList<>();
-                        Date date = new Date();
+            DatabaseReference playlistPushRef = mPlaylistReference.push();
+            String pushId = playlistPushRef.getKey();
+            Date date = new Date();
 
-                        PlaylistObj playlist = new PlaylistObj(newPlaylistName, date, videoIds);
-                        mUserReference.child(newPlaylistName).setValue(playlist);
-                        Intent intent = new Intent(MainActivity.this, PlaylistActivity.class);
-                        intent.putExtra("playlistName", newPlaylistName);
-                        startActivity(intent);
-                    }
-                }
+            PlaylistObj playlist = new PlaylistObj(newPlaylistName, date, mUId);
+            playlist.setPlaylistId(pushId);
 
-                @Override
-                public void onCancelled(DatabaseError arg0) {
-                }
-            });
+            playlistPushRef.setValue(playlist);
+            Intent intent = new Intent(MainActivity.this, PlaylistActivity.class);
+            intent.putExtra("playlistName", newPlaylistName);
+            intent.putExtra("playlistId", playlist.getPlaylistId());
+            startActivity(intent);
+//
+//            mUserReference.child(newPlaylistName).addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(DataSnapshot snapshot) {
+//                    if (snapshot.getValue() != null) {
+//                        mNewPlaylistName.setError(newPlaylistName + " already exists!");
+//                    } else {
+//                        List videoIds = new ArrayList<>();
+//                        Date date = new Date();
+//
+//                        PlaylistObj playlist = new PlaylistObj(newPlaylistName, date, videoIds);
+//                        mUserReference.child(newPlaylistName).setValue(playlist);
+//                        Intent intent = new Intent(MainActivity.this, PlaylistActivity.class);
+//                        intent.putExtra("playlistName", newPlaylistName);
+//                        startActivity(intent);
+//                    }
+//                }
+//
+//                @Override
+//                public void onCancelled(DatabaseError arg0) {
+//                }
+//            });
         }
     }
 
@@ -156,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void setupFirebaseAdapter() {
         mFirebaseAdapter = new FirebaseRecyclerAdapter<PlaylistObj, FirebasePlaylistViewHolder>
-                (PlaylistObj.class, R.layout.playlist_list_item, FirebasePlaylistViewHolder.class, mUserReference) {
+                (PlaylistObj.class, R.layout.playlist_list_item, FirebasePlaylistViewHolder.class, mPlaylistReference) {
             @Override
             protected void populateViewHolder(FirebasePlaylistViewHolder viewHolder, PlaylistObj model, int position) {
                 viewHolder.bindPlaylist(model);

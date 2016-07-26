@@ -36,6 +36,7 @@ public class FirebasePlaylistViewHolder extends RecyclerView.ViewHolder implemen
     private String mUId;
     private DatabaseReference mUserReference;
     private String mPlaylistName;
+    private String mPlaylistId;
 
 
     View mView;
@@ -76,6 +77,7 @@ public class FirebasePlaylistViewHolder extends RecyclerView.ViewHolder implemen
         dateTextView.setText(playlist.getTimestamp());
 
         mPlaylistName = playlist.getPlaylistName();
+        mPlaylistId = playlist.getPlaylistId();
     }
 
     @Override
@@ -103,6 +105,8 @@ public class FirebasePlaylistViewHolder extends RecyclerView.ViewHolder implemen
 
         Intent intent = new Intent(mContext, PlaylistActivity.class);
         intent.putExtra("playlistName", mPlaylistName);
+        intent.putExtra("playlistId", mPlaylistId);
+
 
         mContext.startActivity(intent);
     }
