@@ -1,10 +1,14 @@
 package com.epicodus.ytplaylists.models;
 
+import com.google.firebase.database.Exclude;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Guest on 7/15/16.
@@ -51,6 +55,14 @@ public class PlaylistObj {
     }
     public void setSharedUsers(List<String> sharedUsers) {
         this.sharedUsers = sharedUsers;
+    }
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("sharedUsers", sharedUsers);
+
+        return result;
     }
 
 }

@@ -75,7 +75,6 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
             final int itemPosition = getLayoutPosition();
 
             final UserObj user = mUsers.get(itemPosition);
-            Log.d("XXXXXXX", "onClick: " + user.getUserId());
             String email = mUserEmailTextView.getText().toString();
 
 

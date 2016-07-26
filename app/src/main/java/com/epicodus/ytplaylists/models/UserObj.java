@@ -1,10 +1,14 @@
 package com.epicodus.ytplaylists.models;
 
+import com.google.firebase.database.Exclude;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Guest on 7/15/16.
@@ -15,7 +19,7 @@ public class UserObj {
     String name;
     String email;
     List<String> playlistIds = new ArrayList<>();
-    List<String> friendIds = new ArrayList<>();
+//    List<String> friendIds = new ArrayList<>();
 
     public UserObj() {
     }
@@ -63,14 +67,22 @@ public class UserObj {
     public void setEmail(String email) {
         this.email = email;
     }
+//
+//    public List<String> getFriendIds() {
+//        return friendIds;
+//    }
+//    public void addFriendId(String friendId) {
+//        this.friendIds.add(friendId);
+//    }
+//    public void setFriendIds(List<String> friendIds) {
+//        this.friendIds = friendIds;
+//    }
 
-    public List<String> getFriendIds() {
-        return friendIds;
-    }
-    public void addFriendId(String friendId) {
-        this.friendIds.add(friendId);
-    }
-    public void setFriendIds(List<String> friendIds) {
-        this.friendIds = friendIds;
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("playlistIds", playlistIds);
+
+        return result;
     }
 }
