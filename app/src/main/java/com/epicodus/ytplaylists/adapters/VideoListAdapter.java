@@ -37,7 +37,6 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     private String mPlaylistName;
     private String mUId;
 
-
     public VideoListAdapter(Context context, ArrayList<VideoObj> videos, String playlistName, String uId) {
         mContext = context;
         mVideos = videos;
@@ -99,11 +98,13 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
                             DatabaseReference playlistRef = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_USERS)
                                     .child(mUId);
 
-                            playlistRef.child(Constants.FIREBASE_CHILD_PLAYLISTS).child(mPlaylistName).child(Constants.FIREBASE_CHILD_VIDEOS).push().setValue(mVideos.get(itemPosition));
+                            playlistRef.child(Constants.FIREBASE_CHILD_PLAYLISTS)
+                                    .child(mPlaylistName)
+                                    .child(Constants.FIREBASE_CHILD_VIDEOS)
+                                    .push().setValue(mVideos.get(itemPosition));
 
                             Intent intent = new Intent(mContext, PlaylistActivity.class);
                             intent.putExtra("playlistName", mPlaylistName);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             mContext.startActivity(intent);
                         }})
                     .setNegativeButton(android.R.string.no, null).show();

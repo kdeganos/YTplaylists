@@ -118,6 +118,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+
+        if (id == R.id.actionViewPlaylists) {
+            Intent intent = new Intent(MainActivity.this, SharedPlaylistsActivity.class);
+            intent.putExtra("uId", mUId);
+            startActivity(intent);
+        }
         if (id == R.id.action_logout) {
             logout();
             return true;

@@ -11,27 +11,28 @@ import java.util.List;
  */
 public class PlaylistObj {
     String playlistName;
-    List<VideoObj> videoObject = new ArrayList<>();
+    List<VideoObj> videos = new ArrayList<>();
     String timestamp;
+    List<String> sharedUsers = new ArrayList<>();
 
     public PlaylistObj() {}
 
-    public PlaylistObj(String name, Date timestamp, List<VideoObj> videoObject) {
+    public PlaylistObj(String name, Date timestamp, List<VideoObj> videos) {
         this.playlistName = name;
-        this.videoObject = videoObject;
+        this.videos = videos;
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         this.timestamp = dateFormat.format(timestamp);
     }
 
     public List<VideoObj> getVideos() {
-        return videoObject;
+        return videos;
     }
-    public void addVideoId(VideoObj videoId) {
-        this.videoObject.add(videoId);
+    public void addVideos(VideoObj video) {
+        this.videos.add(video);
     }
-    public void setVideoIds(List<VideoObj> videoObject) {
-        this.videoObject = videoObject;
+    public void setVideos(List<VideoObj> videos) {
+        this.videos = videos;
     }
 
     public String getPlaylistName() {
@@ -42,5 +43,14 @@ public class PlaylistObj {
         return timestamp;
     }
 
+    public List<String> getSharedUsers() {
+        return sharedUsers;
+    }
+    public void addSharedUser(String sharedUser) {
+        this.sharedUsers.add(sharedUser);
+    }
+    public void setSharedUsers(List<String> sharedUsers) {
+        this.sharedUsers = sharedUsers;
+    }
 
 }

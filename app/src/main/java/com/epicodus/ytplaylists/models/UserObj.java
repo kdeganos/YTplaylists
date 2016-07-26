@@ -10,6 +10,8 @@ import java.util.List;
  * Created by Guest on 7/15/16.
  */
 public class UserObj {
+
+    String userId;
     String name;
     String email;
     List<String> playlistIds = new ArrayList<>();
@@ -18,12 +20,22 @@ public class UserObj {
     public UserObj() {
     }
 
-    public UserObj(String name, String email, List<String> playlistIds) {
+    public UserObj(String userId, String name, String email, List<String> playlistIds) {
+        this.userId = userId;
         this.name = name;
         this.email = email;
         this.playlistIds = playlistIds;
 
     }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
 
     public String getName() {
         return name;

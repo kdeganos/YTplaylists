@@ -14,8 +14,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.epicodus.ytplaylists.Constants;
 import com.epicodus.ytplaylists.R;
@@ -46,7 +48,8 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     private String mUId;
-    private String playlistName;
+    private String mPlaylistName;
+    private String mQuery;
     private List<VideoObj> mVideos = new ArrayList<>();
 
     private DatabaseReference mPlaylistReference;
@@ -56,6 +59,7 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
     @Bind(R.id.recyclerView) RecyclerView mRecyclerView;
     @Bind(R.id.videoSearchButton) Button mVideoSearchButton;
     @Bind(R.id.videoSearchEditText) EditText mVideoSearchEditText;
+//    @Bind(R.id.actionAddUserSpinner) Spinner mAddUserSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +70,8 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
         ButterKnife.bind(this);
 
         Intent intent = getIntent();
-        playlistName = intent.getStringExtra("playlistName");
-        getSupportActionBar().setTitle(playlistName);
+        mPlaylistName = intent.getStringExtra("playlistName");
+        getSupportActionBar().setTitle(mPlaylistName);
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -79,7 +83,7 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
                     mPlaylistReference = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_USERS)
                             .child(mUId);
 
-                    mPlaylistReference.child(Constants.FIREBASE_CHILD_PLAYLISTS).child(playlistName).child(Constants.FIREBASE_CHILD_VIDEOS)
+                    mPlaylistReference.child(Constants.FIREBASE_CHILD_PLAYLISTS).child(mPlaylistName).child(Constants.FIREBASE_CHILD_VIDEOS)
                             .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot snapshot) {
@@ -105,7 +109,7 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
     private void setUpFirebaseAdapter() {
 
         mFirebaseAdapter = new FirebaseVideoListAdapter (VideoObj.class, R.layout.video_list_item_drag, FirebaseVideoViewHolder.class,
-                mPlaylistReference.child(Constants.FIREBASE_CHILD_PLAYLISTS).child(playlistName).child(Constants.FIREBASE_CHILD_VIDEOS), this, this);
+                mPlaylistReference.child(Constants.FIREBASE_CHILD_PLAYLISTS).child(mPlaylistName).child(Constants.FIREBASE_CHILD_VIDEOS), this, this);
 
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -129,6 +133,12 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
         ButterKnife.bind(this);
 
 
+//        Spinner mySpinnerSpinner = (Spinner)findViewById(R.id.actionAddUserSpinner);
+//        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.types_array, android.R.layout.simple_spinner_item);
+//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        mAddUserSpinner.setAdapter(adapter);
+
+
 //        MenuItem menuItem = menu.findItem(R.id.action_search);
 //        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
 //
@@ -138,7 +148,7 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
 //            public boolean onQueryTextSubmit(String query) {
 //                Intent intent = new Intent(PlaylistActivity.this, SearchActivity.class);
 //                intent.putExtra("searchTerms", query);
-//                intent.putExtra("playlistName", playlistName);
+//                intent.putExtra("mPlaylistName", mPlaylistName);
 //                intent.putExtra("uId", mUId);
 //                startActivity(intent);
 //                return false;
@@ -159,7 +169,12 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_add_user) {
+        if (id == R.id.actionAddUserSpinner) {
+            Intent intent = new Intent(PlaylistActivity.this, AddUserActivity.class);
+            intent.putExtra("searchTerms", mQuery);
+            intent.putExtra("playlistName", mPlaylistName);
+            intent.putExtra("uId", mUId);
+            startActivity(intent);
             return true;
 
         }
@@ -195,10 +210,10 @@ public class PlaylistActivity extends AppCompatActivity implements OnStartDragLi
     @Override
     public void onClick(View view) {
         if (view == mVideoSearchButton) {
-            String query = mVideoSearchEditText.getText().toString();
+            mQuery = mVideoSearchEditText.getText().toString();
             Intent intent = new Intent(PlaylistActivity.this, SearchActivity.class);
-            intent.putExtra("searchTerms", query);
-            intent.putExtra("playlistName", playlistName);
+            intent.putExtra("searchTerms", mQuery);
+            intent.putExtra("playlistName", mPlaylistName);
             intent.putExtra("uId", mUId);
             startActivity(intent);
         }
