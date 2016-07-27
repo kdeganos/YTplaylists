@@ -109,6 +109,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
 
                             Intent intent = new Intent(mContext, PlaylistActivity.class);
                             intent.putExtra("playlistName", mPlaylistName);
+                            intent.putExtra("playlistId", mPlaylistId);
                             mContext.startActivity(intent);
                         }})
                     .setNegativeButton(android.R.string.no, null).show();
